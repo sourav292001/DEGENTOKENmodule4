@@ -1,0 +1,51 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.18;
+
+// Import necessary contracts from OpenZeppelin library
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+
+
+// Import Hardhat's console for debugging
+import "hardhat/console.sol";
+
+// Define the NewToken contract inheriting from ERC20 and Ownable
+contract DegenToken is ERC20, Ownable {
+    // Constructor to initialize the token with name "Degan" and symbol "DGN"
+    constructor() ERC20("Degen", "DGN") {}
+
+    // Event emitted when tokens are redeemed
+    event TokensRedeemed(address account, uint chosenOption); 
+
+    // Function to mint tokens and assign them to a specific address, only be able to done by the owner
+    function mintTokens(address to, uint amount) public onlyOwner {
+        _mint(to, amount);
+    }
+
+    // Function to transfer tokens from sender's address to another address
+    function transfer(address to, uint256 amount) public virtual override returns (bool) {
+        _transfer(_msgSender(), to, amount);
+        return true;
+    }
+
+    // Function to get the token balance of the sender's address
+    function getBalance() external view returns (uint) {
+        return balanceOf(msg.sender);
+    }
+
+    // Function to redeem tokens for a chosen option
+    function redeemTokens(uint chosenOption) public {
+        uint requiredTokens = chosenOption * 10; 
+        require(balanceOf(msg.sender) >= requiredTokens, "Not enough tokens");
+        burnTokens(requiredTokens);
+        emit TokensRedeemed(msg.sender, chosenOption);
+    }
+
+    // Function to burn a specific amount of tokens from the sender's address
+    function burnTokens(uint amount) public {
+        _burn(msg.sender, amount);
+    }
+}
+//0xFF5A5f37eDC3Ce9d85ce87e56dC47FD87d60e958
+
+//0xdCADEF53E78C725231f5A33E85363dC6FFb2E7a6
